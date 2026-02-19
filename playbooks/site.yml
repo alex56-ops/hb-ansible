@@ -1,6 +1,6 @@
 ---
 - name: Baseline server configuration and hardening
-  hosts: servers
+  hosts: test_servers
   become: true
 
   roles:

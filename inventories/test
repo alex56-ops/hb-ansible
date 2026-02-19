@@ -1,4 +1,4 @@
 [test_servers]
-ansible-test-server
+ansible-test-server-auto
 
 [testservers:vars]

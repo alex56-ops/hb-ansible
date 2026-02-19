@@ -2,12 +2,12 @@
 # General variables for all hosts
 
 # SSH port — used as ansible_port for connections
-ansible_port: "{{ baseline_config_ssh_port }}"
+ansible_port: 4343
 
 # Admin user
 baseline_config_admin_users:
   - name: hbadmin
-    ssh_pubkey: "{{ vault_hbadmin_ssh_pubkey }}"
+    ssh_pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPHWyoRMlrra8cqK8ftcSLVSKTTNrcFX3qIW82oU9HRU hbadmin"
 
 # Service user
 caddy_user: hbadmin
