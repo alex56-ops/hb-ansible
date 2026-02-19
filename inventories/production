@@ -1,2 +1,4 @@
-[servers]
-server01 ansible_host=YOUR_SERVER_IP
+[prod_servers]
+hb-prod-server
+
+[prod_servers:vars]

@@ -1,2 +1,4 @@
-[servers]
-testserver01 ansible_host=YOUR_TEST_SERVER_IP
+[test_servers]
+ansible-test-server
+
+[testservers:vars]
