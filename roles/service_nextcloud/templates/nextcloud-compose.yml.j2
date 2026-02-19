@@ -1,0 +1,36 @@
+# {{ ansible_managed }}
+services:
+  nextcloud:
+    image: {{ service_nextcloud_image }}
+    container_name: nextcloud
+    restart: unless-stopped
+    env_file: nextcloud.env
+    volumes:
+      - {{ service_nextcloud_base_dir }}/data:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - {{ service_nextcloud_network }}
+      - nextcloud_internal
+
+  db:
+    image: {{ service_nextcloud_db_image }}
+    container_name: nextcloud-db
+    restart: unless-stopped
+    env_file: nextcloud-db.env
+    volumes:
+      - {{ service_nextcloud_base_dir }}/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ service_nextcloud_db_user }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nextcloud_internal
+
+networks:
+  {{ service_nextcloud_network }}:
+    external: true
+  nextcloud_internal:
+    driver: bridge

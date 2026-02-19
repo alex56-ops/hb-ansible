@@ -1,0 +1,31 @@
+---
+# User running the Nextcloud containers
+service_nextcloud_user: "{{ baseline_config_admin_users[0].name }}"
+
+# Base directory for Nextcloud files
+service_nextcloud_base_dir: /opt/nextcloud
+
+# Domain — REQUIRED, set in host/group vars
+service_nextcloud_domain: ""
+
+# Container images — pin to specific versions
+service_nextcloud_image: docker.io/library/nextcloud:30-apache
+service_nextcloud_db_image: docker.io/library/postgres:16-alpine
+
+# Database
+service_nextcloud_db_name: nextcloud
+service_nextcloud_db_user: nextcloud
+service_nextcloud_db_password: "{{ vault_nextcloud_db_password }}"
+
+# Admin
+service_nextcloud_admin_user: admin
+service_nextcloud_admin_password: "{{ vault_nextcloud_admin_password }}"
+
+# Podman network (shared with Caddy)
+service_nextcloud_network: caddy_network
+
+# Upload limit
+service_nextcloud_max_upload_size: 10G
+
+# Caddy base directory for site config drop-in
+service_nextcloud_caddy_base_dir: "{{ caddy_base_dir | default('/opt/caddy') }}"

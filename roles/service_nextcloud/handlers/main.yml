@@ -1,0 +1,19 @@
+---
+- name: Restart nextcloud
+  ansible.builtin.shell:
+    cmd: podman-compose down && podman-compose up -d
+    chdir: "{{ service_nextcloud_base_dir }}"
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+  changed_when: false
+
+- name: Reload caddy for nextcloud
+  ansible.builtin.command:
+    cmd: podman exec caddy caddy reload --config /etc/caddy/Caddyfile
+  become: true
+  become_user: "{{ caddy_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_caddy_uid }}"
+  changed_when: false

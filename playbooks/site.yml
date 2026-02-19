@@ -5,3 +5,5 @@
 
   roles:
     - baseline_config
+    - caddy
+    - service_nextcloud

@@ -12,3 +12,9 @@ vault_ansible_user_password: "PLACEHOLDER_PASSWORD_HASH"
 # SSH public keys for admin users
 vault_alex_ssh_pubkey: "PLACEHOLDER_SSH_PUBKEY_ALEX"
 vault_sina_ssh_pubkey: "PLACEHOLDER_SSH_PUBKEY_SINA"
+
+# Nextcloud database password
+vault_nextcloud_db_password: "PLACEHOLDER_NEXTCLOUD_DB_PASSWORD"
+
+# Nextcloud admin password
+vault_nextcloud_admin_password: "PLACEHOLDER_NEXTCLOUD_ADMIN_PASSWORD"

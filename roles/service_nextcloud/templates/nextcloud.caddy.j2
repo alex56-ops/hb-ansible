@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+{{ service_nextcloud_domain }} {
+    reverse_proxy nextcloud:80
+
+    request_body {
+        max_size {{ service_nextcloud_max_upload_size }}
+    }
+}

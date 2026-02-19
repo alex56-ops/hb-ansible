@@ -11,12 +11,8 @@ baseline_config_ssh_x11_forwarding: false
 baseline_config_user_name: ansible
 baseline_config_user_shell: /bin/bash
 
-# Admin users (SSH keys from vault)
-baseline_config_admin_users:
-  - name: alex
-    ssh_pubkey: "{{ vault_alex_ssh_pubkey }}"
-  - name: sina
-    ssh_pubkey: "{{ vault_sina_ssh_pubkey }}"
+# Admin users — override in group_vars/host_vars
+baseline_config_admin_users: []
 
 # NTP (PTB time servers)
 baseline_config_ntp_servers:

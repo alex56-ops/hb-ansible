@@ -1,2 +1,22 @@
 ---
 # General variables for all hosts
+
+# SSH port — used as ansible_port for connections
+ansible_port: "{{ baseline_config_ssh_port }}"
+
+# Admin users
+baseline_config_admin_users:
+  - name: alex
+    ssh_pubkey: "{{ vault_alex_ssh_pubkey }}"
+  - name: sina
+    ssh_pubkey: "{{ vault_sina_ssh_pubkey }}"
+
+# Service users — explicit to avoid index dependency on admin_users
+caddy_user: alex
+service_nextcloud_user: alex
+
+# Caddy — Let's Encrypt email
+caddy_email: ""  # PLACEHOLDER — e.g. admin@example.com
+
+# Nextcloud — domain
+service_nextcloud_domain: ""  # PLACEHOLDER — e.g. cloud.example.com

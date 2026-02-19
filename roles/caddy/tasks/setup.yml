@@ -1,0 +1,43 @@
+---
+- name: Look up caddy user UID
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ caddy_user }}"
+  register: caddy_getent
+
+- name: Set caddy user UID fact
+  ansible.builtin.set_fact:
+    caddy_uid: "{{ caddy_getent.ansible_facts.getent_passwd[caddy_user][1] }}"
+
+- name: Allow HTTP traffic through firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ caddy_http_port | string }}"
+    proto: tcp
+
+- name: Allow HTTPS traffic through firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ caddy_https_port | string }}"
+    proto: tcp
+
+- name: Allow unprivileged ports from 80 for rootless Podman
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: "80"
+    sysctl_file: /etc/sysctl.d/99-unprivileged-ports.conf
+    reload: true
+    state: present
+
+- name: Create Podman network for Caddy
+  ansible.builtin.command:
+    cmd: podman network create {{ caddy_network }}
+  become: true
+  become_user: "{{ caddy_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ caddy_uid }}"
+  register: caddy_network_result
+  changed_when: caddy_network_result.rc == 0
+  failed_when:
+    - caddy_network_result.rc != 0
+    - "'already exists' not in caddy_network_result.stderr"

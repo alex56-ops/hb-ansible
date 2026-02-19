@@ -1,0 +1,8 @@
+---
+- name: Set up Caddy prerequisites
+  ansible.builtin.import_tasks: setup.yml
+  tags: caddy_setup
+
+- name: Deploy Caddy stack
+  ansible.builtin.import_tasks: deploy.yml
+  tags: caddy_deploy

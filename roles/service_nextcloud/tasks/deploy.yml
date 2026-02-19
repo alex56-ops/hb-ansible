@@ -1,0 +1,91 @@
+---
+- name: Look up Nextcloud user UID
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ service_nextcloud_user }}"
+  register: service_nextcloud_getent
+
+- name: Set Nextcloud user UID fact
+  ansible.builtin.set_fact:
+    service_nextcloud_uid: "{{ service_nextcloud_getent.ansible_facts.getent_passwd[service_nextcloud_user][1] }}"
+
+- name: Look up Caddy user UID for handler
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ caddy_user }}"
+  register: service_nextcloud_caddy_getent
+
+- name: Set Caddy user UID fact for handler
+  ansible.builtin.set_fact:
+    service_nextcloud_caddy_uid: "{{ service_nextcloud_caddy_getent.ansible_facts.getent_passwd[caddy_user][1] }}"
+
+- name: Create Nextcloud directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ service_nextcloud_user }}"
+    group: "{{ service_nextcloud_user }}"
+    mode: "0755"
+  loop:
+    - "{{ service_nextcloud_base_dir }}"
+    - "{{ service_nextcloud_base_dir }}/data"
+    - "{{ service_nextcloud_base_dir }}/db"
+
+- name: Template Nextcloud environment file
+  ansible.builtin.template:
+    src: nextcloud.env.j2
+    dest: "{{ service_nextcloud_base_dir }}/nextcloud.env"
+    owner: "{{ service_nextcloud_user }}"
+    group: "{{ service_nextcloud_user }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart nextcloud
+
+- name: Template Nextcloud database environment file
+  ansible.builtin.template:
+    src: nextcloud-db.env.j2
+    dest: "{{ service_nextcloud_base_dir }}/nextcloud-db.env"
+    owner: "{{ service_nextcloud_user }}"
+    group: "{{ service_nextcloud_user }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart nextcloud
+
+- name: Template Nextcloud compose file
+  ansible.builtin.template:
+    src: nextcloud-compose.yml.j2
+    dest: "{{ service_nextcloud_base_dir }}/compose.yml"
+    owner: "{{ service_nextcloud_user }}"
+    group: "{{ service_nextcloud_user }}"
+    mode: "0644"
+  notify: Restart nextcloud
+
+- name: Template Nextcloud Caddy site config
+  ansible.builtin.template:
+    src: nextcloud.caddy.j2
+    dest: "{{ service_nextcloud_caddy_base_dir }}/sites/nextcloud.caddy"
+    owner: "{{ service_nextcloud_user }}"
+    group: "{{ service_nextcloud_user }}"
+    mode: "0644"
+  notify: Reload caddy for nextcloud
+
+- name: Check if Nextcloud container is running
+  ansible.builtin.command:
+    cmd: podman ps --filter name=nextcloud --format {{ '{{.Names}}' }}
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+  register: service_nextcloud_running
+  changed_when: false
+
+- name: Start Nextcloud stack
+  ansible.builtin.command:
+    cmd: podman-compose up -d
+    chdir: "{{ service_nextcloud_base_dir }}"
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+  when: "'nextcloud' not in service_nextcloud_running.stdout"
+  changed_when: true

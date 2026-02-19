@@ -29,7 +29,7 @@
   ansible.builtin.lineinfile:
     path: /etc/subuid
     regexp: "^{{ item.name }}:"
-    line: "{{ item.name }}:100000:65536"
+    line: "{{ item.name }}:{{ 100000 + (idx * 65536) }}:65536"
     create: true
     owner: root
     group: root
@@ -37,12 +37,13 @@
   loop: "{{ baseline_config_admin_users }}"
   loop_control:
     label: "{{ item.name }}"
+    index_var: idx
 
 - name: Configure subgid ranges for admin users
   ansible.builtin.lineinfile:
     path: /etc/subgid
     regexp: "^{{ item.name }}:"
-    line: "{{ item.name }}:100000:65536"
+    line: "{{ item.name }}:{{ 100000 + (idx * 65536) }}:65536"
     create: true
     owner: root
     group: root
@@ -50,6 +51,7 @@
   loop: "{{ baseline_config_admin_users }}"
   loop_control:
     label: "{{ item.name }}"
+    index_var: idx
 
 - name: Enable linger for admin users
   ansible.builtin.command:

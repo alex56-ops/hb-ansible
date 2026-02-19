@@ -9,6 +9,7 @@
     create_home: true
     password: "{{ vault_ansible_user_password | default(omit) }}"
     state: present
+  no_log: true
 
 - name: Deploy SSH public key for Ansible user
   ansible.posix.authorized_key:
@@ -49,10 +50,10 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: Configure passwordless sudo for admin users
+- name: Configure sudo for admin users
   ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ item.name }}"
-    content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL\n"
+    content: "{{ item.name }} ALL=(ALL:ALL) ALL\n"
     owner: root
     group: root
     mode: "0440"
