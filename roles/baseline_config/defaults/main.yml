@@ -1,24 +1,24 @@
 ---
-# SSH-Konfiguration
-baseline_config_ssh_port: 2222  # Bitte anpassen
+# SSH configuration
+baseline_config_ssh_port: 2222  # Adjust as needed
 baseline_config_ssh_permit_root: false
 baseline_config_ssh_password_auth: false
 baseline_config_ssh_pubkey_auth: true
 baseline_config_ssh_max_auth_tries: 3
 baseline_config_ssh_x11_forwarding: false
 
-# Benutzer
+# Users
 baseline_config_user_name: ansible
 baseline_config_user_shell: /bin/bash
 
-# Admin-Benutzer (SSH-Keys aus Vault)
+# Admin users (SSH keys from vault)
 baseline_config_admin_users:
   - name: alex
     ssh_pubkey: "{{ vault_alex_ssh_pubkey }}"
   - name: sina
     ssh_pubkey: "{{ vault_sina_ssh_pubkey }}"
 
-# NTP (PTB-Zeitserver)
+# NTP (PTB time servers)
 baseline_config_ntp_servers:
   - ptbtime1.ptb.de
   - ptbtime2.ptb.de
@@ -26,7 +26,7 @@ baseline_config_ntp_servers:
 baseline_config_ntp_fallback_servers:
   - ntp.ubuntu.com
 
-# Firewall (ufw)
+# Firewall (UFW)
 baseline_config_ufw_allowed_ports:
   - { port: "{{ baseline_config_ssh_port }}", proto: tcp }
 
@@ -35,13 +35,13 @@ baseline_config_fail2ban_bantime: 3600
 baseline_config_fail2ban_findtime: 600
 baseline_config_fail2ban_maxretry: 5
 
-# Unattended-Upgrades
+# Unattended upgrades
 baseline_config_unattended_reboot: false
 baseline_config_unattended_reboot_time: "02:00"
 
-# Sysctl / Kernel-Hardening
-baseline_config_ip_forward: 0  # Auf 1 setzen wenn Podman rootful/Port-Forwarding genutzt wird
-baseline_config_disable_ipv6: 1  # Auf 0 setzen wenn IPv6 benoetigt wird
+# Sysctl / kernel hardening
+baseline_config_ip_forward: 0  # Set to 1 if Podman rootful / port forwarding is used
+baseline_config_disable_ipv6: 1  # Set to 0 if IPv6 is needed
 
 # Logging (journald)
 baseline_config_journald_max_use: 500M

@@ -1,5 +1,5 @@
 ---
-- name: Podman und Abhaengigkeiten installieren
+- name: Install Podman and dependencies
   ansible.builtin.apt:
     name:
       - podman
@@ -9,7 +9,7 @@
     state: present
     update_cache: true
 
-- name: Podman Registries konfigurieren
+- name: Configure Podman registries
   ansible.builtin.template:
     src: podman_registries.conf.j2
     dest: /etc/containers/registries.conf
@@ -17,7 +17,7 @@
     group: root
     mode: "0644"
 
-- name: Podman Storage konfigurieren
+- name: Configure Podman storage
   ansible.builtin.template:
     src: podman_storage.conf.j2
     dest: /etc/containers/storage.conf
@@ -25,7 +25,7 @@
     group: root
     mode: "0644"
 
-- name: Subuid-Ranges fuer Admin-User einrichten
+- name: Configure subuid ranges for admin users
   ansible.builtin.lineinfile:
     path: /etc/subuid
     regexp: "^{{ item.name }}:"
@@ -38,7 +38,7 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: Subgid-Ranges fuer Admin-User einrichten
+- name: Configure subgid ranges for admin users
   ansible.builtin.lineinfile:
     path: /etc/subgid
     regexp: "^{{ item.name }}:"
@@ -51,7 +51,7 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: Linger fuer Admin-User aktivieren
+- name: Enable linger for admin users
   ansible.builtin.command:
     cmd: "loginctl enable-linger {{ item.name }}"
     creates: "/var/lib/systemd/linger/{{ item.name }}"

@@ -1,6 +1,6 @@
 ---
-# --- Ansible Automations-User ---
-- name: Ansible-User erstellen
+# --- Ansible automation user ---
+- name: Create Ansible user
   ansible.builtin.user:
     name: "{{ baseline_config_user_name }}"
     shell: "{{ baseline_config_user_shell }}"
@@ -10,14 +10,14 @@
     password: "{{ vault_ansible_user_password | default(omit) }}"
     state: present
 
-- name: SSH-Public-Key fuer Ansible-User deployen
+- name: Deploy SSH public key for Ansible user
   ansible.posix.authorized_key:
     user: "{{ baseline_config_user_name }}"
     key: "{{ vault_ansible_ssh_pubkey }}"
     state: present
     exclusive: true
 
-- name: Passwordless sudo fuer Ansible-User einrichten
+- name: Configure passwordless sudo for Ansible user
   ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ baseline_config_user_name }}"
     content: "{{ baseline_config_user_name }} ALL=(ALL) NOPASSWD:ALL\n"
@@ -26,8 +26,8 @@
     mode: "0440"
     validate: "visudo -cf %s"
 
-# --- Admin-Benutzer ---
-- name: Admin-User erstellen
+# --- Admin users ---
+- name: Create admin users
   ansible.builtin.user:
     name: "{{ item.name }}"
     shell: /bin/bash
@@ -39,7 +39,7 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: SSH-Public-Key fuer Admin-User deployen
+- name: Deploy SSH public keys for admin users
   ansible.posix.authorized_key:
     user: "{{ item.name }}"
     key: "{{ item.ssh_pubkey }}"
@@ -49,7 +49,7 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: Passwordless sudo fuer Admin-User einrichten
+- name: Configure passwordless sudo for admin users
   ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ item.name }}"
     content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL\n"

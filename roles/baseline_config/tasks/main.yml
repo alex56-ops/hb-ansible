@@ -1,27 +1,36 @@
 ---
-- name: Benutzer konfigurieren
+- name: Configure users
   ansible.builtin.import_tasks: users.yml
+  tags: users
 
-- name: SSH haerten
+- name: Harden SSH
   ansible.builtin.import_tasks: ssh.yml
+  tags: ssh
 
-- name: Firewall einrichten
+- name: Configure firewall
   ansible.builtin.import_tasks: firewall.yml
+  tags: firewall
 
-- name: NTP konfigurieren
+- name: Configure NTP
   ansible.builtin.import_tasks: ntp.yml
+  tags: ntp
 
-- name: Kernel-Hardening (sysctl)
+- name: Apply kernel hardening (sysctl)
   ansible.builtin.import_tasks: sysctl.yml
+  tags: sysctl
 
-- name: Fail2ban einrichten
+- name: Configure Fail2ban
   ansible.builtin.import_tasks: fail2ban.yml
+  tags: fail2ban
 
-- name: Unattended-Upgrades konfigurieren
+- name: Configure unattended upgrades
   ansible.builtin.import_tasks: unattended_upgrades.yml
+  tags: unattended_upgrades
 
-- name: Logging konfigurieren
+- name: Configure logging
   ansible.builtin.import_tasks: logging.yml
+  tags: logging
 
-- name: Podman installieren und konfigurieren
+- name: Install and configure Podman
   ansible.builtin.import_tasks: podman.yml
+  tags: podman

@@ -1,11 +1,11 @@
 # {{ ansible_managed }}
-# SSH-Konfiguration — gehaertet durch Ansible
+# Hardened SSH configuration managed by Ansible
 
 Port {{ baseline_config_ssh_port }}
 AddressFamily inet
 ListenAddress 0.0.0.0
 
-# Authentifizierung
+# Authentication
 PermitRootLogin {{ 'yes' if baseline_config_ssh_permit_root else 'no' }}
 PubkeyAuthentication {{ 'yes' if baseline_config_ssh_pubkey_auth else 'no' }}
 PasswordAuthentication {{ 'yes' if baseline_config_ssh_password_auth else 'no' }}
@@ -15,7 +15,7 @@ MaxAuthTries {{ baseline_config_ssh_max_auth_tries }}
 LoginGraceTime 30
 AuthenticationMethods publickey
 
-# Zugriffsbeschraenkung
+# Access control
 AllowUsers {{ baseline_config_user_name }} {{ baseline_config_admin_users | map(attribute='name') | join(' ') }}
 
 # Features
@@ -26,7 +26,7 @@ TCPKeepAlive yes
 ClientAliveInterval 300
 ClientAliveCountMax 2
 
-# Starke Algorithmen
+# Strong algorithms
 KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
 Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
 MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
@@ -36,7 +36,7 @@ HostKeyAlgorithms ssh-ed25519,rsa-sha2-512,rsa-sha2-256
 SyslogFacility AUTH
 LogLevel VERBOSE
 
-# Sonstiges
+# Miscellaneous
 PermitEmptyPasswords no
 MaxSessions 3
 AllowAgentForwarding no

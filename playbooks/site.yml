@@ -1,5 +1,5 @@
 ---
-- name: Server-Grundkonfiguration und Haertung
+- name: Baseline server configuration and hardening
   hosts: servers
   become: true
 

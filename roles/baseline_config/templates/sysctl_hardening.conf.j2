@@ -1,39 +1,39 @@
 # {{ ansible_managed }}
-# Kernel-Hardening-Parameter
+# Kernel hardening parameters
 
-# IP-Forwarding (0 = deaktiviert, 1 = aktiviert fuer Docker)
+# IP forwarding (0 = disabled, 1 = enabled for Docker/Podman)
 net.ipv4.ip_forward = {{ baseline_config_ip_forward }}
 
-# ICMP-Redirects ablehnen
+# Reject ICMP redirects
 net.ipv4.conf.all.accept_redirects = 0
 net.ipv4.conf.default.accept_redirects = 0
 net.ipv4.conf.all.send_redirects = 0
 net.ipv4.conf.default.send_redirects = 0
 
-# Source-Routing deaktivieren
+# Disable source routing
 net.ipv4.conf.all.accept_source_route = 0
 net.ipv4.conf.default.accept_source_route = 0
 
-# SYN-Flood-Schutz
+# SYN flood protection
 net.ipv4.tcp_syncookies = 1
 
-# Reverse-Path-Filtering
+# Reverse path filtering
 net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.default.rp_filter = 1
 
-# Martian-Pakete loggen
+# Log martian packets
 net.ipv4.conf.all.log_martians = 1
 net.ipv4.conf.default.log_martians = 1
 
-# ICMP-Broadcast ignorieren
+# Ignore ICMP broadcasts
 net.ipv4.icmp_echo_ignore_broadcasts = 1
 
-# Bogus ICMP-Responses ignorieren
+# Ignore bogus ICMP responses
 net.ipv4.icmp_ignore_bogus_error_responses = 1
 
-# IPv6 deaktivieren (falls nicht benoetigt)
+# Disable IPv6 (if not needed)
 net.ipv6.conf.all.disable_ipv6 = {{ baseline_config_disable_ipv6 }}
 net.ipv6.conf.default.disable_ipv6 = {{ baseline_config_disable_ipv6 }}
 
-# ASLR aktivieren
+# Enable ASLR
 kernel.randomize_va_space = 2

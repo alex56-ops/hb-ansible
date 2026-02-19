@@ -1,5 +1,5 @@
 ---
-- name: Timesyncd konfigurieren
+- name: Configure timesyncd
   ansible.builtin.template:
     src: timesyncd.conf.j2
     dest: /etc/systemd/timesyncd.conf
@@ -8,7 +8,7 @@
     mode: "0644"
   notify: Restart systemd-timesyncd
 
-- name: Timesyncd aktivieren und starten
+- name: Enable and start timesyncd
   ansible.builtin.systemd:
     name: systemd-timesyncd
     enabled: true

@@ -2,46 +2,50 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Projektbeschreibung
+## Project description
 
-Ansible-Projekt zur Serveradministration und Service-Bereitstellung.
+Ansible project for server administration and service provisioning. The `baseline_config` role handles OS-level hardening, user management, firewall, logging, and container runtime setup.
 
-## Befehle
+## Commands
 
 ```bash
-# Syntax-Check eines Playbooks
+# Syntax check a playbook
 ansible-playbook playbooks/<name>.yml --syntax-check
 
-# Playbook im Dry-Run ausführen
+# Dry-run a playbook
 ansible-playbook playbooks/<name>.yml --check --diff
 
-# Playbook ausführen
+# Run a playbook
 ansible-playbook playbooks/<name>.yml
 
-# Einzelne Rolle testen (mit Tag)
-ansible-playbook playbooks/<name>.yml --tags <rollenname>
+# Run specific tags only
+ansible-playbook playbooks/site.yml --tags ssh,firewall
 
-# Vault-Datei bearbeiten
-ansible-vault edit <datei>
+# Edit a vault file
+ansible-vault edit <file>
 
-# Lint-Prüfung
+# Lint check
 ansible-lint
 ```
 
-## Projektstruktur
+## Project structure
 
-Das Projekt folgt der Standard-Ansible-Verzeichnisstruktur:
+Standard Ansible directory layout:
 
-- `inventories/` — Inventory-Dateien (Hosts, Gruppen)
+- `inventories/` — Inventory files (hosts, groups)
 - `playbooks/` — Playbooks
-- `roles/` — Rollen mit Standardstruktur (tasks, handlers, templates, defaults, vars, files)
-- `group_vars/` — Gruppenvariablen (ggf. Vault-verschlüsselt)
-- `host_vars/` — Hostvariablen (ggf. Vault-verschlüsselt)
+- `roles/` — Roles with standard structure (tasks, handlers, templates, defaults, vars, files)
+- `group_vars/` — Group variables (vault-encrypted where needed)
+- `host_vars/` — Host variables (vault-encrypted where needed)
 
-## Konventionen
+## Conventions
 
-- **Secrets**: Gehören ausschließlich in Ansible-Vault-verschlüsselte Dateien. Niemals Klartext-Secrets in Rollen, Playbooks oder Templates. Platzhalter einfügen — Verschlüsselung erfolgt manuell.
-- **Neue Services**: Vor dem Erstellen einer neuen Rolle mindestens zwei bestehende, vergleichbare Rollen analysieren und deren Struktur und Muster übernehmen.
-- **Strukturtreue**: Bestehende Verzeichnis- und Dateistruktur strikt einhalten. Keine neuen Muster einführen, die von bestehenden Rollen abweichen.
-- **Commits**: Niemals eigenständig Commits erstellen. Commits erfolgen ausschließlich über den `/ship` Skill.
-- **Sprache**: Kommunikation erfolgt auf Deutsch.
+- **Language (code)**: All code, task names, comments, and template comments must be in English.
+- **Language (communication)**: Communicate with the user in German.
+- **Secrets**: Must only go into Ansible Vault-encrypted files. Never put plaintext secrets in roles, playbooks, or templates. Insert placeholders — encryption is done manually.
+- **New services**: Before creating a new role, analyze at least two existing comparable roles and adopt their structure and patterns.
+- **Structure**: Strictly follow the existing directory and file structure. Do not introduce patterns that deviate from existing roles.
+- **Tags**: Every task file imported in `tasks/main.yml` must have a corresponding tag. Tags allow selective deployment via `--tags`.
+- **Idempotency**: All tasks must be idempotent. `changed` status should only occur on real changes. Handlers should use `changed_when: false` for command modules.
+- **Linting**: `ansible-lint` must pass cleanly (0 errors, 0 warnings).
+- **Commits**: Never create commits autonomously. Commits are done exclusively via the `/ship` skill.
