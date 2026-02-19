@@ -1,0 +1,21 @@
+---
+- name: Benutzer konfigurieren
+  ansible.builtin.import_tasks: users.yml
+
+- name: SSH haerten
+  ansible.builtin.import_tasks: ssh.yml
+
+- name: Firewall einrichten
+  ansible.builtin.import_tasks: firewall.yml
+
+- name: NTP konfigurieren
+  ansible.builtin.import_tasks: ntp.yml
+
+- name: Kernel-Hardening (sysctl)
+  ansible.builtin.import_tasks: sysctl.yml
+
+- name: Fail2ban einrichten
+  ansible.builtin.import_tasks: fail2ban.yml
+
+- name: Unattended-Upgrades konfigurieren
+  ansible.builtin.import_tasks: unattended_upgrades.yml

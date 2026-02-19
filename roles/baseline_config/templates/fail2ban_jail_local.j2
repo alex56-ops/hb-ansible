@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+bantime = {{ baseline_config_fail2ban_bantime }}
+findtime = {{ baseline_config_fail2ban_findtime }}
+maxretry = {{ baseline_config_fail2ban_maxretry }}
+backend = systemd
+
+[sshd]
+enabled = true
+port = {{ baseline_config_ssh_port }}
+filter = sshd
+logpath = %(sshd_log)s
+maxretry = {{ baseline_config_fail2ban_maxretry }}

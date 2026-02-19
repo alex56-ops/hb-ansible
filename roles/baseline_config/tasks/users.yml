@@ -1,0 +1,26 @@
+---
+- name: Ansible-User erstellen
+  ansible.builtin.user:
+    name: "{{ baseline_config_user_name }}"
+    shell: "{{ baseline_config_user_shell }}"
+    groups: sudo
+    append: true
+    create_home: true
+    password: "{{ vault_ansible_user_password | default(omit) }}"
+    state: present
+
+- name: SSH-Public-Key fuer Ansible-User deployen
+  ansible.posix.authorized_key:
+    user: "{{ baseline_config_user_name }}"
+    key: "{{ vault_ansible_ssh_pubkey }}"
+    state: present
+    exclusive: true
+
+- name: Passwordless sudo fuer Ansible-User einrichten
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ baseline_config_user_name }}"
+    content: "{{ baseline_config_user_name }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"

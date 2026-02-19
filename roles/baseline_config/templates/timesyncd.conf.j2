@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+
+[Time]
+NTP={{ baseline_config_ntp_servers | join(' ') }}
+FallbackNTP={{ baseline_config_ntp_fallback_servers | join(' ') }}

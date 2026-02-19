@@ -1,0 +1,7 @@
+---
+- name: Server-Grundkonfiguration und Haertung
+  hosts: servers
+  become: true
+
+  roles:
+    - baseline_config

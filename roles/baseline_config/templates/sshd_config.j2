@@ -1,0 +1,48 @@
+# {{ ansible_managed }}
+# SSH-Konfiguration — gehaertet durch Ansible
+
+Port {{ baseline_config_ssh_port }}
+AddressFamily inet
+ListenAddress 0.0.0.0
+
+# Authentifizierung
+PermitRootLogin {{ 'yes' if baseline_config_ssh_permit_root else 'no' }}
+PubkeyAuthentication {{ 'yes' if baseline_config_ssh_pubkey_auth else 'no' }}
+PasswordAuthentication {{ 'yes' if baseline_config_ssh_password_auth else 'no' }}
+ChallengeResponseAuthentication no
+UsePAM yes
+MaxAuthTries {{ baseline_config_ssh_max_auth_tries }}
+LoginGraceTime 30
+AuthenticationMethods publickey
+
+# Zugriffsbeschraenkung
+AllowUsers {{ baseline_config_user_name }}
+
+# Features
+X11Forwarding {{ 'yes' if baseline_config_ssh_x11_forwarding else 'no' }}
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+# Starke Algorithmen
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+HostKeyAlgorithms ssh-ed25519,rsa-sha2-512,rsa-sha2-256
+
+# Logging
+SyslogFacility AUTH
+LogLevel VERBOSE
+
+# Sonstiges
+PermitEmptyPasswords no
+MaxSessions 3
+AllowAgentForwarding no
+AllowTcpForwarding no
+PermitTunnel no
+Banner none
+
+# SFTP
+Subsystem sftp /usr/lib/openssh/sftp-server
