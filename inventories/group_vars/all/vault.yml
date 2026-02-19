@@ -1,6 +1,6 @@
 ---
 # Vault-encrypted secrets — placeholders
-# Encrypt with: ansible-vault encrypt inventories/production/group_vars/all/vault.yml
+# Encrypt with: ansible-vault encrypt_string
 
 # SSH public key for Ansible user
 vault_ansible_ssh_pubkey: "PLACEHOLDER_SSH_PUBKEY"
