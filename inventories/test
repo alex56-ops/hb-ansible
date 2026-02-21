@@ -1,5 +1,5 @@
 [test_servers]
-ansible-test-server-auto
+ansible-hb-test-server
 
 [test_servers:vars]
 baseline_config_ignore_lid_switch=true

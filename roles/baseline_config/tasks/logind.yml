@@ -6,12 +6,12 @@
     owner: root
     group: root
     mode: "0755"
-  when: baseline_config_ignore_lid_switch
+  when: baseline_config_ignore_lid_switch | bool
 
 - name: Disable lid switch suspend
   ansible.builtin.copy:
     content: |
-      # {{ ansible_managed }}
+      # Managed by Ansible
       [Login]
       HandleLidSwitch=ignore
       HandleLidSwitchExternalPower=ignore
@@ -21,4 +21,4 @@
     group: root
     mode: "0644"
   notify: Restart systemd-logind
-  when: baseline_config_ignore_lid_switch
+  when: baseline_config_ignore_lid_switch | bool
