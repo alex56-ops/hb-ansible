@@ -15,10 +15,13 @@ caddy_user: hbadmin
 service_nextcloud_user: hbadmin
 
 # Caddy — Let's Encrypt email
-caddy_email: ""  # PLACEHOLDER — e.g. admin@example.com
+caddy_email: "alexander.baer02+letsencrypt@gmail.com"
 
 # Service domains
-service_nextcloud_domain: ""  # PLACEHOLDER — e.g. cloud.example.com
-service_vaultwarden_domain: ""  # PLACEHOLDER — e.g. vault.example.com
-service_paperless_domain: ""  # PLACEHOLDER — e.g. docs.example.com
-service_jitsi_domain: ""  # PLACEHOLDER — e.g. meet.example.com
+service_nextcloud_domain: "nextcloud.nexus4-2.de"
+service_vaultwarden_domain: "vault.nexus4-2.de"
+service_paperless_domain: "paperless.nexus4-2.de"
+service_jitsi_domain: "meet.nexus4-2.de"
+
+# Vaultwarden — disable admin panel
+service_vaultwarden_admin_token: ""
