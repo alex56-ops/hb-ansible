@@ -11,11 +11,15 @@ baseline_config_admin_users:
     ssh_pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPHWyoRMlrra8cqK8ftcSLVSKTTNrcFX3qIW82oU9HRU hbadmin"
 
 # Service user
-caddy_user: hbadmin
+service_caddy_user: hbadmin
 service_nextcloud_user: hbadmin
 
 # Caddy — Let's Encrypt email
-caddy_email: "alexander.baer02+letsencrypt@gmail.com"
+service_caddy_email: "alexander.baer02+letsencrypt@gmail.com"
+
+# Authelia
+service_authelia_domain: "auth.nexus4-2.de"
+service_authelia_cookie_domain: ".nexus4-2.de"
 
 # Service domains
 service_nextcloud_domain: "nextcloud.nexus4-2.de"

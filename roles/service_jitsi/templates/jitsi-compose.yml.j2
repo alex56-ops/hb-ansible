@@ -48,6 +48,21 @@ services:
     networks:
       - jitsi_internal
 
+{% if service_jitsi_oidc_enabled %}
+  jitsi-openid:
+    image: {{ service_jitsi_openid_image }}
+    container_name: jitsi-openid
+    restart: unless-stopped
+    environment:
+      JITSI_SECRET: {{ service_jitsi_jwt_secret }}
+      JITSI_URL: https://{{ service_jitsi_domain }}
+      ISSUER_URL: {{ service_jitsi_oidc_issuer_url }}
+      CLIENT_ID: {{ service_jitsi_oidc_client_id }}
+      CLIENT_SECRET: {{ service_jitsi_oidc_client_secret }}
+    networks:
+      - {{ service_jitsi_network }}
+{% endif %}
+
 networks:
   {{ service_jitsi_network }}:
     external: true

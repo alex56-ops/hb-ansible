@@ -28,8 +28,14 @@ service_paperless_admin_password: "{{ vault_paperless_admin_password }}"
 # OCR languages (+ separated)
 service_paperless_ocr_language: deu+eng
 
+# OIDC authentication via Authelia
+service_paperless_oidc_enabled: true
+service_paperless_oidc_provider_url: "https://{{ service_authelia_domain }}"
+service_paperless_oidc_client_id: paperless
+service_paperless_oidc_client_secret: "{{ vault_authelia_oidc_paperless_client_secret }}"
+
 # Podman network (shared with Caddy)
-service_paperless_network: "{{ caddy_network }}"
+service_paperless_network: "{{ service_caddy_network }}"
 
 # Caddy base directory for site config drop-in
-service_paperless_caddy_base_dir: "{{ caddy_base_dir | default('/opt/caddy') }}"
+service_paperless_caddy_base_dir: "{{ service_caddy_base_dir | default('/opt/caddy') }}"

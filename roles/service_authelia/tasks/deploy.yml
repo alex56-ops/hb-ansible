@@ -1,0 +1,109 @@
+---
+- name: Look up Authelia user UID
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ service_authelia_user }}"
+  register: service_authelia_getent
+
+- name: Set Authelia user UID fact
+  ansible.builtin.set_fact:
+    service_authelia_uid: "{{ service_authelia_getent.ansible_facts.getent_passwd[service_authelia_user][1] }}"
+
+- name: Look up Caddy user UID for handler
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ service_caddy_user }}"
+  register: service_authelia_caddy_getent
+
+- name: Set Caddy user UID fact for handler
+  ansible.builtin.set_fact:
+    service_authelia_caddy_uid: "{{ service_authelia_caddy_getent.ansible_facts.getent_passwd[service_caddy_user][1] }}"
+
+- name: Create Authelia base directory
+  ansible.builtin.file:
+    path: "{{ service_authelia_base_dir }}"
+    state: directory
+    owner: "{{ service_authelia_user }}"
+    group: "{{ service_authelia_user }}"
+    mode: "0755"
+
+- name: Create Authelia data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  become: true
+  become_user: "{{ service_authelia_user }}"
+  loop:
+    - "{{ service_authelia_base_dir }}/config"
+    - "{{ service_authelia_base_dir }}/db"
+    - "{{ service_authelia_base_dir }}/redis"
+
+- name: Template Authelia configuration file
+  ansible.builtin.template:
+    src: authelia-configuration.yml.j2
+    dest: "{{ service_authelia_base_dir }}/config/configuration.yml"
+    owner: "{{ service_authelia_user }}"
+    group: "{{ service_authelia_user }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart authelia
+
+- name: Template Authelia users database
+  ansible.builtin.template:
+    src: authelia-users.yml.j2
+    dest: "{{ service_authelia_base_dir }}/config/users_database.yml"
+    owner: "{{ service_authelia_user }}"
+    group: "{{ service_authelia_user }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart authelia
+
+- name: Template Authelia database environment file
+  ansible.builtin.template:
+    src: authelia-db.env.j2
+    dest: "{{ service_authelia_base_dir }}/authelia-db.env"
+    owner: "{{ service_authelia_user }}"
+    group: "{{ service_authelia_user }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart authelia
+
+- name: Template Authelia compose file
+  ansible.builtin.template:
+    src: authelia-compose.yml.j2
+    dest: "{{ service_authelia_base_dir }}/compose.yml"
+    owner: "{{ service_authelia_user }}"
+    group: "{{ service_authelia_user }}"
+    mode: "0644"
+  notify: Restart authelia
+
+- name: Template Authelia Caddy site config
+  ansible.builtin.template:
+    src: authelia.caddy.j2
+    dest: "{{ service_authelia_caddy_base_dir }}/sites/authelia.caddy"
+    owner: "{{ service_authelia_user }}"
+    group: "{{ service_authelia_user }}"
+    mode: "0644"
+  notify: Reload caddy for authelia
+
+- name: Check if Authelia container is running
+  ansible.builtin.command:
+    cmd: podman ps --filter name=authelia --format {{ '{{.Names}}' }}
+  become: true
+  become_user: "{{ service_authelia_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_authelia_uid }}"
+  register: service_authelia_running
+  changed_when: false
+
+- name: Start Authelia stack
+  ansible.builtin.command:
+    cmd: podman-compose up -d
+    chdir: "{{ service_authelia_base_dir }}"
+  become: true
+  become_user: "{{ service_authelia_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_authelia_uid }}"
+  when: "'authelia' not in service_authelia_running.stdout"
+  changed_when: true

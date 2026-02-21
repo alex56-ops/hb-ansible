@@ -88,3 +88,25 @@ vault_jitsi_jvb_auth_password: !vault |
   37653365616235363831366665613530643361616636393331363764636164363662326436616634
   62353533626162656261643738636333323236653733346436343836393865626562343263653338
   396463323934363963313262623536626632
+
+# Authelia core secrets
+# Generate all random secrets with: openssl rand -hex 64
+vault_authelia_db_password: "CHANGE_ME"
+vault_authelia_jwt_secret: "CHANGE_ME"
+vault_authelia_session_secret: "CHANGE_ME"
+vault_authelia_storage_encryption_key: "CHANGE_ME"
+vault_authelia_oidc_hmac_secret: "CHANGE_ME"
+# Generate with: openssl genrsa 4096
+vault_authelia_oidc_jwks_private_key: |
+  -----BEGIN RSA PRIVATE KEY-----
+  REPLACE_WITH_GENERATED_KEY
+  -----END RSA PRIVATE KEY-----
+
+# OIDC client secrets — generate each with: openssl rand -hex 64
+vault_authelia_oidc_nextcloud_client_secret: "CHANGE_ME"
+vault_authelia_oidc_paperless_client_secret: "CHANGE_ME"
+vault_authelia_oidc_jitsi_client_secret: "CHANGE_ME"
+
+# Jitsi JWT secret (shared between Jitsi and jitsi-openid)
+# Generate with: openssl rand -hex 64
+vault_jitsi_jwt_secret: "CHANGE_ME"

@@ -1,5 +1,10 @@
 # {{ ansible_managed }}
 {{ service_jitsi_domain }} {
+{% if service_jitsi_oidc_enabled %}
+    handle /oidc/* {
+        reverse_proxy jitsi-openid:3000
+    }
+{% endif %}
     reverse_proxy jitsi-web:80 {
         transport http {
             keepalive 30s

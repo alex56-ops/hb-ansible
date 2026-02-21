@@ -1,0 +1,4 @@
+---
+- name: Deploy Authelia stack
+  ansible.builtin.import_tasks: deploy.yml
+  tags: authelia

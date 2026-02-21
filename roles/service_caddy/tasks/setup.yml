@@ -2,23 +2,23 @@
 - name: Look up caddy user UID
   ansible.builtin.getent:
     database: passwd
-    key: "{{ caddy_user }}"
-  register: caddy_getent
+    key: "{{ service_caddy_user }}"
+  register: service_caddy_getent
 
 - name: Set caddy user UID fact
   ansible.builtin.set_fact:
-    caddy_uid: "{{ caddy_getent.ansible_facts.getent_passwd[caddy_user][1] }}"
+    service_caddy_uid: "{{ service_caddy_getent.ansible_facts.getent_passwd[service_caddy_user][1] }}"
 
 - name: Allow HTTP traffic through firewall
   community.general.ufw:
     rule: allow
-    port: "{{ caddy_http_port | string }}"
+    port: "{{ service_caddy_http_port | string }}"
     proto: tcp
 
 - name: Allow HTTPS traffic through firewall
   community.general.ufw:
     rule: allow
-    port: "{{ caddy_https_port | string }}"
+    port: "{{ service_caddy_https_port | string }}"
     proto: tcp
 
 - name: Allow unprivileged ports from 80 for rootless Podman
@@ -31,13 +31,13 @@
 
 - name: Create Podman network for Caddy
   ansible.builtin.command:
-    cmd: podman network create {{ caddy_network }}
+    cmd: podman network create {{ service_caddy_network }}
   become: true
-  become_user: "{{ caddy_user }}"
+  become_user: "{{ service_caddy_user }}"
   environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ caddy_uid }}"
-  register: caddy_network_result
-  changed_when: caddy_network_result.rc == 0
+    XDG_RUNTIME_DIR: "/run/user/{{ service_caddy_uid }}"
+  register: service_caddy_network_result
+  changed_when: service_caddy_network_result.rc == 0
   failed_when:
-    - caddy_network_result.rc != 0
-    - "'already exists' not in caddy_network_result.stderr"
+    - service_caddy_network_result.rc != 0
+    - "'already exists' not in service_caddy_network_result.stderr"

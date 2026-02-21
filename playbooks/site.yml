@@ -5,7 +5,8 @@
 
   roles:
     - baseline_config
-    - caddy
+    - service_caddy
+    - service_authelia
     - service_nextcloud
     - service_vaultwarden
     - service_paperless

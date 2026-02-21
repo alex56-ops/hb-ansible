@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+services:
+  caddy:
+    image: {{ service_caddy_image }}
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "{{ service_caddy_http_port }}:80"
+      - "{{ service_caddy_https_port }}:443"
+      - "{{ service_caddy_https_port }}:443/udp"
+    volumes:
+      - {{ service_caddy_base_dir }}/Caddyfile:/etc/caddy/Caddyfile:ro
+      - {{ service_caddy_base_dir }}/sites:/etc/caddy/sites:ro
+      - {{ service_caddy_base_dir }}/data:/data
+      - {{ service_caddy_base_dir }}/config:/config
+    networks:
+      - {{ service_caddy_network }}
+
+networks:
+  {{ service_caddy_network }}:
+    external: true

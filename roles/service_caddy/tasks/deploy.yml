@@ -1,0 +1,62 @@
+---
+- name: Look up Caddy user UID
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ service_caddy_user }}"
+  register: service_caddy_getent
+
+- name: Set Caddy user UID fact
+  ansible.builtin.set_fact:
+    service_caddy_uid: "{{ service_caddy_getent.ansible_facts.getent_passwd[service_caddy_user][1] }}"
+
+- name: Create Caddy directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ service_caddy_user }}"
+    group: "{{ service_caddy_user }}"
+    mode: "0755"
+  loop:
+    - "{{ service_caddy_base_dir }}"
+    - "{{ service_caddy_base_dir }}/data"
+    - "{{ service_caddy_base_dir }}/config"
+    - "{{ service_caddy_base_dir }}/sites"
+
+- name: Template Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: "{{ service_caddy_base_dir }}/Caddyfile"
+    owner: "{{ service_caddy_user }}"
+    group: "{{ service_caddy_user }}"
+    mode: "0644"
+  notify: Reload caddy
+
+- name: Template Caddy compose file
+  ansible.builtin.template:
+    src: caddy-compose.yml.j2
+    dest: "{{ service_caddy_base_dir }}/compose.yml"
+    owner: "{{ service_caddy_user }}"
+    group: "{{ service_caddy_user }}"
+    mode: "0644"
+  notify: Restart caddy
+
+- name: Check if Caddy container is running
+  ansible.builtin.command:
+    cmd: podman ps --filter name=caddy --format {{ '{{.Names}}' }}
+  become: true
+  become_user: "{{ service_caddy_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_caddy_uid }}"
+  register: service_caddy_running
+  changed_when: false
+
+- name: Start Caddy stack
+  ansible.builtin.command:
+    cmd: podman-compose up -d
+    chdir: "{{ service_caddy_base_dir }}"
+  become: true
+  become_user: "{{ service_caddy_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_caddy_uid }}"
+  when: "'caddy' not in service_caddy_running.stdout"
+  changed_when: true

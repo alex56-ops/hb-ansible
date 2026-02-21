@@ -21,11 +21,17 @@ service_nextcloud_db_password: "{{ vault_nextcloud_db_password }}"
 service_nextcloud_admin_user: admin
 service_nextcloud_admin_password: "{{ vault_nextcloud_admin_password }}"
 
+# OIDC authentication via Authelia
+service_nextcloud_oidc_enabled: true
+service_nextcloud_oidc_provider_url: "https://{{ service_authelia_domain }}"
+service_nextcloud_oidc_client_id: nextcloud
+service_nextcloud_oidc_client_secret: "{{ vault_authelia_oidc_nextcloud_client_secret }}"
+
 # Podman network (shared with Caddy)
-service_nextcloud_network: "{{ caddy_network }}"
+service_nextcloud_network: "{{ service_caddy_network }}"
 
 # Upload limit
 service_nextcloud_max_upload_size: 10G
 
 # Caddy base directory for site config drop-in
-service_nextcloud_caddy_base_dir: "{{ caddy_base_dir | default('/opt/caddy') }}"
+service_nextcloud_caddy_base_dir: "{{ service_caddy_base_dir | default('/opt/caddy') }}"

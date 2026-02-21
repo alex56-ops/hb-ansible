@@ -1,0 +1,88 @@
+# {{ ansible_managed }}
+---
+server:
+  address: tcp://0.0.0.0:9091
+
+log:
+  level: info
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+
+session:
+  cookies:
+    - domain: {{ service_authelia_cookie_domain }}
+      authelia_url: https://{{ service_authelia_domain }}
+      default_redirection_url: https://{{ service_authelia_domain }}
+  secret: {{ service_authelia_session_secret }}
+  redis:
+    host: authelia-redis
+    port: 6379
+
+storage:
+  encryption_key: {{ service_authelia_storage_encryption_key }}
+  postgres:
+    address: tcp://authelia-db:5432
+    database: {{ service_authelia_db_name }}
+    username: {{ service_authelia_db_user }}
+    password: {{ service_authelia_db_password }}
+
+access_control:
+  default_policy: one_factor
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+identity_validation:
+  reset_password:
+    jwt_secret: {{ service_authelia_jwt_secret }}
+
+identity_providers:
+  oidc:
+    hmac_secret: {{ service_authelia_oidc_hmac_secret }}
+    jwks:
+      - key: |
+{{ service_authelia_oidc_jwks_private_key | indent(10, first=true) }}
+    clients:
+      - client_id: nextcloud
+        client_name: Nextcloud
+        client_secret: $plaintext${{ service_authelia_oidc_nextcloud_client_secret }}
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://{{ service_authelia_nextcloud_domain }}/apps/user_oidc/code
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        token_endpoint_auth_method: client_secret_post
+
+      - client_id: paperless
+        client_name: Paperless-ngx
+        client_secret: $plaintext${{ service_authelia_oidc_paperless_client_secret }}
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://{{ service_authelia_paperless_domain }}/accounts/oidc/authelia/login/callback/
+        scopes:
+          - openid
+          - profile
+          - email
+        token_endpoint_auth_method: client_secret_post
+        pkce_challenge_method: S256
+
+      - client_id: jitsi
+        client_name: Jitsi Meet
+        client_secret: $plaintext${{ service_authelia_oidc_jitsi_client_secret }}
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://{{ service_authelia_jitsi_domain }}/oidc/callback
+        scopes:
+          - openid
+          - profile
+          - email
+        token_endpoint_auth_method: client_secret_post

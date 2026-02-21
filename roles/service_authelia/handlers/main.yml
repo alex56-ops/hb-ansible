@@ -1,19 +1,19 @@
 ---
-- name: Restart jitsi
+- name: Restart authelia
   ansible.builtin.shell:
     cmd: podman-compose down && podman-compose up -d
-    chdir: "{{ service_jitsi_base_dir }}"
+    chdir: "{{ service_authelia_base_dir }}"
   become: true
-  become_user: "{{ service_jitsi_user }}"
+  become_user: "{{ service_authelia_user }}"
   environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ service_jitsi_uid }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ service_authelia_uid }}"
   changed_when: false
 
-- name: Reload caddy for jitsi
+- name: Reload caddy for authelia
   ansible.builtin.command:
     cmd: podman exec caddy caddy reload --config /etc/caddy/Caddyfile
   become: true
   become_user: "{{ service_caddy_user }}"
   environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ service_jitsi_caddy_uid }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ service_authelia_caddy_uid }}"
   changed_when: false

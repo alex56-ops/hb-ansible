@@ -1,0 +1,45 @@
+---
+# User running the Authelia containers
+service_authelia_user: "{{ baseline_config_admin_users[0].name }}"
+
+# Base directory for Authelia files
+service_authelia_base_dir: /opt/authelia
+
+# Domain — REQUIRED, set in host/group vars
+service_authelia_domain: ""
+
+# Cookie domain (with leading dot for subdomain sharing)
+service_authelia_cookie_domain: ""
+
+# Container images — pin to specific versions
+service_authelia_image: docker.io/authelia/authelia:4.38
+service_authelia_db_image: docker.io/library/postgres:16.6-alpine
+service_authelia_redis_image: docker.io/library/redis:7.4-alpine
+
+# Database
+service_authelia_db_name: authelia
+service_authelia_db_user: authelia
+service_authelia_db_password: "{{ vault_authelia_db_password }}"
+
+# Secrets
+service_authelia_jwt_secret: "{{ vault_authelia_jwt_secret }}"
+service_authelia_session_secret: "{{ vault_authelia_session_secret }}"
+service_authelia_storage_encryption_key: "{{ vault_authelia_storage_encryption_key }}"
+service_authelia_oidc_hmac_secret: "{{ vault_authelia_oidc_hmac_secret }}"
+service_authelia_oidc_jwks_private_key: "{{ vault_authelia_oidc_jwks_private_key }}"
+
+# OIDC client secrets — from vault
+service_authelia_oidc_nextcloud_client_secret: "{{ vault_authelia_oidc_nextcloud_client_secret }}"
+service_authelia_oidc_paperless_client_secret: "{{ vault_authelia_oidc_paperless_client_secret }}"
+service_authelia_oidc_jitsi_client_secret: "{{ vault_authelia_oidc_jitsi_client_secret }}"
+
+# Service domains (for OIDC redirect URIs)
+service_authelia_nextcloud_domain: "{{ service_nextcloud_domain }}"
+service_authelia_paperless_domain: "{{ service_paperless_domain }}"
+service_authelia_jitsi_domain: "{{ service_jitsi_domain }}"
+
+# Podman network (shared with Caddy)
+service_authelia_network: "{{ service_caddy_network }}"
+
+# Caddy base directory for site config drop-in
+service_authelia_caddy_base_dir: "{{ service_caddy_base_dir | default('/opt/caddy') }}"

@@ -1,0 +1,51 @@
+# {{ ansible_managed }}
+services:
+  authelia:
+    image: {{ service_authelia_image }}
+    container_name: authelia
+    restart: unless-stopped
+    volumes:
+      - {{ service_authelia_base_dir }}/config:/config
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - {{ service_authelia_network }}
+      - authelia_internal
+
+  db:
+    image: {{ service_authelia_db_image }}
+    container_name: authelia-db
+    restart: unless-stopped
+    env_file: authelia-db.env
+    volumes:
+      - {{ service_authelia_base_dir }}/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ service_authelia_db_user }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - authelia_internal
+
+  redis:
+    image: {{ service_authelia_redis_image }}
+    container_name: authelia-redis
+    restart: unless-stopped
+    volumes:
+      - {{ service_authelia_base_dir }}/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - authelia_internal
+
+networks:
+  {{ service_authelia_network }}:
+    external: true
+  authelia_internal:
+    driver: bridge

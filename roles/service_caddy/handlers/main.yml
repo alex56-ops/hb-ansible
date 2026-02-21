@@ -2,18 +2,18 @@
 - name: Restart caddy
   ansible.builtin.shell:
     cmd: podman-compose down && podman-compose up -d
-    chdir: "{{ caddy_base_dir }}"
+    chdir: "{{ service_caddy_base_dir }}"
   become: true
-  become_user: "{{ caddy_user }}"
+  become_user: "{{ service_caddy_user }}"
   environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ caddy_uid }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ service_caddy_uid }}"
   changed_when: false
 
 - name: Reload caddy
   ansible.builtin.command:
     cmd: podman exec caddy caddy reload --config /etc/caddy/Caddyfile
   become: true
-  become_user: "{{ caddy_user }}"
+  become_user: "{{ service_caddy_user }}"
   environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ caddy_uid }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ service_caddy_uid }}"
   changed_when: false

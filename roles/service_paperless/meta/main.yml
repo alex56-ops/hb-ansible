@@ -1,3 +1,3 @@
 ---
 dependencies:
-  - role: caddy
+  - role: service_caddy
