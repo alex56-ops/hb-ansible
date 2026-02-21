@@ -32,11 +32,13 @@ service_authelia_oidc_jwks_private_key: "{{ vault_authelia_oidc_jwks_private_key
 service_authelia_oidc_nextcloud_client_secret: "{{ vault_authelia_oidc_nextcloud_client_secret }}"
 service_authelia_oidc_paperless_client_secret: "{{ vault_authelia_oidc_paperless_client_secret }}"
 service_authelia_oidc_jitsi_client_secret: "{{ vault_authelia_oidc_jitsi_client_secret }}"
+service_authelia_oidc_wordpress_client_secret: "{{ vault_authelia_oidc_wordpress_client_secret }}"
 
 # Service domains (for OIDC redirect URIs)
 service_authelia_nextcloud_domain: "{{ service_nextcloud_domain }}"
 service_authelia_paperless_domain: "{{ service_paperless_domain }}"
 service_authelia_jitsi_domain: "{{ service_jitsi_domain }}"
+service_authelia_wordpress_domain: "{{ service_wordpress_domain }}"
 
 # Podman network (shared with Caddy)
 service_authelia_network: "{{ service_caddy_network }}"

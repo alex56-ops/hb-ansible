@@ -1,0 +1,19 @@
+---
+- name: Restart wordpress
+  ansible.builtin.shell:
+    cmd: podman-compose down && podman-compose up -d
+    chdir: "{{ service_wordpress_base_dir }}"
+  become: true
+  become_user: "{{ service_wordpress_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_wordpress_uid }}"
+  changed_when: false
+
+- name: Reload caddy for wordpress
+  ansible.builtin.command:
+    cmd: podman exec caddy caddy reload --config /etc/caddy/Caddyfile
+  become: true
+  become_user: "{{ service_caddy_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_wordpress_caddy_uid }}"
+  changed_when: false

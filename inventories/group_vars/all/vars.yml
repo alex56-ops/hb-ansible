@@ -26,6 +26,7 @@ service_nextcloud_domain: "nextcloud.nexus4-2.de"
 service_vaultwarden_domain: "vault.nexus4-2.de"
 service_paperless_domain: "paperless.nexus4-2.de"
 service_jitsi_domain: "meet.nexus4-2.de"
+service_wordpress_domain: "wp.nexus4-2.de"
 
 # Vaultwarden — disable admin panel
 service_vaultwarden_admin_token: ""

@@ -106,6 +106,12 @@ vault_authelia_oidc_jwks_private_key: |
 vault_authelia_oidc_nextcloud_client_secret: "CHANGE_ME"
 vault_authelia_oidc_paperless_client_secret: "CHANGE_ME"
 vault_authelia_oidc_jitsi_client_secret: "CHANGE_ME"
+vault_authelia_oidc_wordpress_client_secret: "CHANGE_ME"
+
+# WordPress
+# Generate with: openssl rand -hex 32
+vault_wordpress_db_password: "CHANGE_ME"
+vault_wordpress_db_root_password: "CHANGE_ME"
 
 # Jitsi JWT secret (shared between Jitsi and jitsi-openid)
 # Generate with: openssl rand -hex 64

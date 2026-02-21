@@ -1,0 +1,31 @@
+---
+# User running the WordPress containers
+service_wordpress_user: "{{ baseline_config_admin_users[0].name }}"
+
+# Base directory for WordPress files
+service_wordpress_base_dir: /opt/wordpress
+
+# Domain — REQUIRED, set in host/group vars
+service_wordpress_domain: ""
+
+# Container images — pin to specific versions
+service_wordpress_image: docker.io/library/wordpress:6.7-apache
+service_wordpress_db_image: docker.io/library/mariadb:11.6
+
+# Database
+service_wordpress_db_name: wordpress
+service_wordpress_db_user: wordpress
+service_wordpress_db_password: "{{ vault_wordpress_db_password }}"
+service_wordpress_db_root_password: "{{ vault_wordpress_db_root_password }}"
+
+# OIDC authentication via Authelia (requires manual plugin install)
+service_wordpress_oidc_enabled: true
+service_wordpress_oidc_provider_url: "https://{{ service_authelia_domain }}"
+service_wordpress_oidc_client_id: wordpress
+service_wordpress_oidc_client_secret: "{{ vault_authelia_oidc_wordpress_client_secret }}"
+
+# Podman network (shared with Caddy)
+service_wordpress_network: "{{ service_caddy_network }}"
+
+# Caddy base directory for site config drop-in
+service_wordpress_caddy_base_dir: "{{ service_caddy_base_dir | default('/opt/caddy') }}"

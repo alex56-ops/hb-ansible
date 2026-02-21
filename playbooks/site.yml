@@ -11,3 +11,4 @@
     - service_vaultwarden
     - service_paperless
     - service_jitsi
+    - service_wordpress

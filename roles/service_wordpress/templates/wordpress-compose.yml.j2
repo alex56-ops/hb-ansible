@@ -1,0 +1,36 @@
+# {{ ansible_managed }}
+services:
+  wordpress:
+    image: {{ service_wordpress_image }}
+    container_name: wordpress
+    restart: unless-stopped
+    env_file: wordpress.env
+    volumes:
+      - {{ service_wordpress_base_dir }}/data:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - {{ service_wordpress_network }}
+      - wordpress_internal
+
+  db:
+    image: {{ service_wordpress_db_image }}
+    container_name: wordpress-db
+    restart: unless-stopped
+    env_file: wordpress-db.env
+    volumes:
+      - {{ service_wordpress_base_dir }}/db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wordpress_internal
+
+networks:
+  {{ service_wordpress_network }}:
+    external: true
+  wordpress_internal:
+    driver: bridge

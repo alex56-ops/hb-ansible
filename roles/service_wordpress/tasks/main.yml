@@ -1,0 +1,4 @@
+---
+- name: Deploy WordPress stack
+  ansible.builtin.import_tasks: deploy.yml
+  tags: wordpress

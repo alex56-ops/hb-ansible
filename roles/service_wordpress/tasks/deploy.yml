@@ -1,0 +1,98 @@
+---
+- name: Look up WordPress user UID
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ service_wordpress_user }}"
+  register: service_wordpress_getent
+
+- name: Set WordPress user UID fact
+  ansible.builtin.set_fact:
+    service_wordpress_uid: "{{ service_wordpress_getent.ansible_facts.getent_passwd[service_wordpress_user][1] }}"
+
+- name: Look up Caddy user UID for handler
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ service_caddy_user }}"
+  register: service_wordpress_caddy_getent
+
+- name: Set Caddy user UID fact for handler
+  ansible.builtin.set_fact:
+    service_wordpress_caddy_uid: "{{ service_wordpress_caddy_getent.ansible_facts.getent_passwd[service_caddy_user][1] }}"
+
+- name: Create WordPress base directory
+  ansible.builtin.file:
+    path: "{{ service_wordpress_base_dir }}"
+    state: directory
+    owner: "{{ service_wordpress_user }}"
+    group: "{{ service_wordpress_user }}"
+    mode: "0755"
+
+- name: Create WordPress data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  become: true
+  become_user: "{{ service_wordpress_user }}"
+  loop:
+    - "{{ service_wordpress_base_dir }}/data"
+    - "{{ service_wordpress_base_dir }}/db"
+
+- name: Template WordPress environment file
+  ansible.builtin.template:
+    src: wordpress.env.j2
+    dest: "{{ service_wordpress_base_dir }}/wordpress.env"
+    owner: "{{ service_wordpress_user }}"
+    group: "{{ service_wordpress_user }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart wordpress
+
+- name: Template WordPress database environment file
+  ansible.builtin.template:
+    src: wordpress-db.env.j2
+    dest: "{{ service_wordpress_base_dir }}/wordpress-db.env"
+    owner: "{{ service_wordpress_user }}"
+    group: "{{ service_wordpress_user }}"
+    mode: "0600"
+  no_log: true
+  notify: Restart wordpress
+
+- name: Template WordPress compose file
+  ansible.builtin.template:
+    src: wordpress-compose.yml.j2
+    dest: "{{ service_wordpress_base_dir }}/compose.yml"
+    owner: "{{ service_wordpress_user }}"
+    group: "{{ service_wordpress_user }}"
+    mode: "0644"
+  notify: Restart wordpress
+
+- name: Template WordPress Caddy site config
+  ansible.builtin.template:
+    src: wordpress.caddy.j2
+    dest: "{{ service_wordpress_caddy_base_dir }}/sites/wordpress.caddy"
+    owner: "{{ service_wordpress_user }}"
+    group: "{{ service_wordpress_user }}"
+    mode: "0644"
+  notify: Reload caddy for wordpress
+
+- name: Check if WordPress container is running
+  ansible.builtin.command:
+    cmd: podman ps --filter name=wordpress --format {{ '{{.Names}}' }}
+  become: true
+  become_user: "{{ service_wordpress_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_wordpress_uid }}"
+  register: service_wordpress_running
+  changed_when: false
+
+- name: Start WordPress stack
+  ansible.builtin.command:
+    cmd: podman-compose up -d
+    chdir: "{{ service_wordpress_base_dir }}"
+  become: true
+  become_user: "{{ service_wordpress_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_wordpress_uid }}"
+  when: "'wordpress' not in service_wordpress_running.stdout"
+  changed_when: true
