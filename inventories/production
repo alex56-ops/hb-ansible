@@ -1,4 +1,4 @@
 [prod_servers]
-hb-prod-server
+ansible-hb-prod-server
 
 [prod_servers:vars]
