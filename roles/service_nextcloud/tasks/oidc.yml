@@ -1,0 +1,76 @@
+---
+- name: Check if user_oidc app is installed
+  ansible.builtin.command:
+    cmd: podman exec -u www-data nextcloud php occ app:list --output=json
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+  register: service_nextcloud_app_list
+  changed_when: false
+
+- name: Install user_oidc app
+  ansible.builtin.command:
+    cmd: podman exec -u www-data nextcloud php occ app:install user_oidc
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+  when: "'user_oidc' not in (service_nextcloud_app_list.stdout | from_json).enabled"
+  changed_when: true
+
+- name: Check allow_local_remote_servers setting
+  ansible.builtin.command:
+    cmd: >-
+      podman exec -u www-data nextcloud php occ
+      config:system:get allow_local_remote_servers
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+  register: service_nextcloud_allow_local_check
+  changed_when: false
+  failed_when: false
+
+- name: Allow local remote servers for OIDC discovery
+  ansible.builtin.command:
+    cmd: >-
+      podman exec -u www-data nextcloud php occ
+      config:system:set allow_local_remote_servers
+      --value=true --type=boolean
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+  when: service_nextcloud_allow_local_check.stdout | default('') | trim != 'true'
+  changed_when: true
+
+- name: Configure OIDC provider
+  ansible.builtin.command:
+    argv:
+      - podman
+      - exec
+      - -e
+      - NC_OIDC_SECRET
+      - -u
+      - www-data
+      - nextcloud
+      - php
+      - occ
+      - user_oidc:provider
+      - Authelia
+      - "--clientid={{ service_nextcloud_oidc_client_id }}"
+      - --clientsecret-env=NC_OIDC_SECRET
+      - "--discoveryuri={{ service_nextcloud_oidc_provider_url }}/.well-known/openid-configuration"
+      - --scope=openid email profile groups
+      - --unique-uid=1
+      - --check-bearer=0
+      - --send-id-token-hint=0
+      - --mapping-uid=preferred_username
+  become: true
+  become_user: "{{ service_nextcloud_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ service_nextcloud_uid }}"
+    NC_OIDC_SECRET: "{{ service_nextcloud_oidc_client_secret }}"
+  no_log: true
+  changed_when: false

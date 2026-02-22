@@ -6,6 +6,9 @@ server:
 log:
   level: info
 
+totp:
+  issuer: {{ service_authelia_domain }}
+
 authentication_backend:
   file:
     path: /config/users_database.yml
@@ -28,12 +31,12 @@ storage:
     password: {{ service_authelia_db_password }}
 
 access_control:
-  default_policy: one_factor
+  default_policy: two_factor
   rules:
     - domain:
         - "{{ service_authelia_cookie_domain }}"
         - "*.{{ service_authelia_cookie_domain }}"
-      policy: one_factor
+      policy: two_factor
 
 notifier:
   filesystem:
@@ -54,7 +57,8 @@ identity_providers:
         client_name: Nextcloud
         client_secret: {{ service_authelia_oidc_nextcloud_client_secret_hash }}
         public: false
-        authorization_policy: one_factor
+        authorization_policy: two_factor
+        consent_mode: implicit
         redirect_uris:
           - https://{{ service_authelia_nextcloud_domain }}/apps/user_oidc/code
         scopes:
@@ -68,7 +72,8 @@ identity_providers:
         client_name: Paperless-ngx
         client_secret: {{ service_authelia_oidc_paperless_client_secret_hash }}
         public: false
-        authorization_policy: one_factor
+        authorization_policy: two_factor
+        consent_mode: implicit
         redirect_uris:
           - https://{{ service_authelia_paperless_domain }}/accounts/oidc/authelia/login/callback/
         scopes:
@@ -82,7 +87,8 @@ identity_providers:
         client_name: Jitsi Meet
         client_secret: {{ service_authelia_oidc_jitsi_client_secret_hash }}
         public: false
-        authorization_policy: one_factor
+        authorization_policy: two_factor
+        consent_mode: implicit
         redirect_uris:
           - https://{{ service_authelia_jitsi_domain }}/oidc/callback
         scopes:
@@ -95,7 +101,8 @@ identity_providers:
         client_name: WordPress
         client_secret: {{ service_authelia_oidc_wordpress_client_secret_hash }}
         public: false
-        authorization_policy: one_factor
+        authorization_policy: two_factor
+        consent_mode: implicit
         redirect_uris:
           - https://{{ service_authelia_wordpress_domain }}/wp-admin/admin-ajax.php?action=openid-connect-authorize
         scopes:

@@ -2,3 +2,8 @@
 - name: Deploy Nextcloud stack
   ansible.builtin.import_tasks: deploy.yml
   tags: nextcloud
+
+- name: Configure Nextcloud OIDC
+  ansible.builtin.import_tasks: oidc.yml
+  tags: nextcloud
+  when: service_nextcloud_oidc_enabled
